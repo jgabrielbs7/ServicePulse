@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Chamados')}"></head>
+<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+  <header th:replace="~{fragments/layout :: topbar('dashboard')}"></header>
+
+  <div th:replace="~{fragments/layout :: mobileMenu}"></div>
+  <div id="sidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
+  <main class="lg:ml-64 pt-14 lg:pt-0 mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-xl font-semibold">Chamados</h1>
+      <a th:href="@{/chamados/novo}" class="btn-primary">Novo chamado</a>
+    </div>
+
+    <div th:if="${sucesso}" role="status" th:text="${sucesso}"
+         class="mt-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"></div>
+
+    <!-- Métricas -->
+    <section class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Métricas">
+      <div class="card p-5">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Abertos</p>
+        <p class="mt-1 text-3xl font-semibold" th:text="${metricas.abertos}">0</p>
+      </div>
+      <div class="card p-5">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Em andamento</p>
+        <p class="mt-1 text-3xl font-semibold" th:text="${metricas.emAndamento}">0</p>
+      </div>
+      <div class="card p-5">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Concluídos hoje</p>
+        <p class="mt-1 text-3xl font-semibold" th:text="${metricas.concluidosHoje}">0</p>
+      </div>
+      <div class="card p-5">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Tempo médio de atendimento</p>
+        <p class="mt-1 text-3xl font-semibold" th:text="${metricas.tempoMedio}">—</p>
+      </div>
+    </section>
+
+    <!-- Filtros -->
+    <nav class="mt-8 flex flex-wrap gap-2" aria-label="Filtrar por status">
+      <a th:href="@{/admin/dashboard}" class="rounded-md border px-3 py-1.5 text-sm"
+         th:classappend="${statusSelecionado == null} ? 'border-gray-600 bg-gray-600 text-white dark:border-gray-500 dark:bg-gray-600' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'">Todos</a>
+      <a th:each="s : ${statusList}" th:href="@{/admin/dashboard(status=${s.name()})}" th:text="${s.label}"
+         class="rounded-md border px-3 py-1.5 text-sm"
+         th:classappend="${statusSelecionado == s} ? 'border-gray-600 bg-gray-600 text-white dark:border-gray-500 dark:bg-gray-600' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'">Status</a>
+    </nav>
+
+    <!-- Tabela -->
+    <section class="card mt-4 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="border-b border-gray-200 bg-gray-50 text-left text-gray-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
+            <tr>
+              <th class="px-4 py-3 font-medium">Código</th>
+              <th class="px-4 py-3 font-medium">Cliente</th>
+              <th class="px-4 py-3 font-medium">Motivo</th>
+              <th class="px-4 py-3 font-medium">Prioridade</th>
+              <th class="px-4 py-3 font-medium">Abertura</th>
+              <th class="px-4 py-3 font-medium">Status</th>
+              <th class="px-4 py-3 font-medium">Técnico</th>
+              <th class="px-4 py-3 font-medium">Tempo</th>
+              <th class="px-4 py-3"><span class="sr-only">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tr th:each="c : ${chamados}" class="hover:bg-gray-50 dark:hover:bg-gray-700/40">
+              <td class="whitespace-nowrap px-4 py-3 font-medium" th:text="${c.codigo}">CH-00001</td>
+              <td class="px-4 py-3" th:text="${c.cliente.razaoSocial}">Cliente</td>
+              <td class="px-4 py-3" th:text="${c.motivoAbertura}">Motivo</td>
+              <td class="px-4 py-3"><span th:replace="~{fragments/layout :: prioridadeBadge(${c.prioridade})}"></span></td>
+              <td class="whitespace-nowrap px-4 py-3 text-gray-600 dark:text-gray-300" th:text="${#temporals.format(c.dataAbertura, 'dd/MM/yyyy HH:mm')}">01/01/2026 08:00</td>
+              <td class="px-4 py-3"><span th:replace="~{fragments/layout :: statusBadge(${c.status})}"></span></td>
+              <td class="whitespace-nowrap px-4 py-3" th:text="${c.tecnicoResponsavel != null} ? ${c.tecnicoResponsavel.nome} : 'Sem técnico'"
+                  th:classappend="${c.tecnicoResponsavel == null} ? 'text-gray-400 dark:text-gray-500'">Técnico</td>
+              <td class="whitespace-nowrap px-4 py-3 text-gray-600 dark:text-gray-300" th:text="${c.tempoFormatado}">—</td>
+              <td class="whitespace-nowrap px-4 py-3 text-right">
+                <a th:href="@{/admin/chamados/{id}/editar(id=${c.id})}"
+                   class="font-medium text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">Editar</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p th:if="${#lists.isEmpty(chamados)}" class="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        Nenhum chamado encontrado para este filtro.
+      </p>
+    </section>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

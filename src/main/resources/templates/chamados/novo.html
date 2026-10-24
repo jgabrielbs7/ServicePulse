@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Novo chamado')}"></head>
+<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+  <header th:replace="~{fragments/layout :: topbar('novo')}"></header>
+
+  <div th:replace="~{fragments/layout :: mobileMenu}"></div>
+  <div id="sidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
+  <main class="lg:ml-64 pt-14 lg:pt-0 mx-auto max-w-2xl px-4 py-8 sm:px-6">
+    <h1 class="text-xl font-semibold">Novo chamado</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Registre o atendimento em nome do cliente. A data de abertura é gravada automaticamente.</p>
+
+    <form th:action="@{/chamados}" th:object="${form}" method="post" class="card mt-6 space-y-5 p-6">
+      <div>
+        <label for="clienteId" class="field-label">Cliente</label>
+        <select id="clienteId" th:field="*{clienteId}" class="field">
+          <option value="">Selecione um cliente</option>
+          <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.razaoSocial + ' (' + c.cpfCnpj + ')'}"></option>
+        </select>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Cliente não está na lista?
+          <a th:href="@{/clientes/novo}" class="font-medium text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">Cadastrar cliente</a>
+        </p>
+        <p class="field-error" th:if="${#fields.hasErrors('clienteId')}" th:errors="*{clienteId}"></p>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="motivoAbertura" class="field-label">Motivo</label>
+          <select id="motivoAbertura" th:field="*{motivoAbertura}" class="field">
+            <option value="">Selecione o motivo</option>
+            <option th:each="m : ${motivos}" th:value="${m}" th:text="${m}"></option>
+          </select>
+          <p class="field-error" th:if="${#fields.hasErrors('motivoAbertura')}" th:errors="*{motivoAbertura}"></p>
+        </div>
+        <div>
+          <label for="prioridade" class="field-label">Prioridade</label>
+          <select id="prioridade" th:field="*{prioridade}" class="field">
+            <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p.label}"></option>
+          </select>
+          <p class="field-error" th:if="${#fields.hasErrors('prioridade')}" th:errors="*{prioridade}"></p>
+        </div>
+      </div>
+
+      <div>
+        <label for="tecnicoId" class="field-label">Técnico responsável</label>
+        <select id="tecnicoId" th:field="*{tecnicoId}" class="field">
+          <option value="">Sem técnico</option>
+          <option th:each="t : ${tecnicos}" th:value="${t.id}" th:text="${t.nome}"></option>
+        </select>
+      </div>
+
+      <div>
+        <label for="descricao" class="field-label">Descrição</label>
+        <textarea id="descricao" th:field="*{descricao}" rows="6" class="field" placeholder="O que o cliente relatou? Informe quando começou e quem foi afetado."></textarea>
+        <p class="field-error" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></p>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <a th:href="@{/admin/dashboard}" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary">Abrir chamado</button>
+      </div>
+    </form>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

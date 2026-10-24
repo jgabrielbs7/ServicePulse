@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Cliente')}"></head>
+<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+  <header th:replace="~{fragments/layout :: topbar('clientes')}"></header>
+
+  <div th:replace="~{fragments/layout :: mobileMenu}"></div>
+  <div id="sidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
+  <main class="lg:ml-64 pt-14 lg:pt-0 mx-auto max-w-2xl px-4 py-8 sm:px-6">
+    <h1 class="text-xl font-semibold" th:text="${form.id == null} ? 'Novo cliente' : 'Editar cliente'">Cliente</h1>
+
+    <form th:action="${form.id == null} ? @{/clientes} : @{/clientes/{id}(id=${form.id})}"
+          th:object="${form}" method="post" class="card mt-6 space-y-5 p-6">
+      <div>
+        <label for="razaoSocial" class="field-label">Razão social ou nome</label>
+        <input id="razaoSocial" type="text" th:field="*{razaoSocial}" class="field" autofocus>
+        <p class="field-error" th:if="${#fields.hasErrors('razaoSocial')}" th:errors="*{razaoSocial}"></p>
+      </div>
+
+      <div>
+        <label for="cpfCnpj" class="field-label">CPF ou CNPJ</label>
+        <input id="cpfCnpj" type="text" th:field="*{cpfCnpj}" inputmode="numeric" class="field" placeholder="Somente números ou com pontuação">
+        <p class="field-error" th:if="${#fields.hasErrors('cpfCnpj')}" th:errors="*{cpfCnpj}"></p>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="emailContato" class="field-label">E-mail de contato</label>
+          <input id="emailContato" type="email" th:field="*{emailContato}" class="field">
+          <p class="field-error" th:if="${#fields.hasErrors('emailContato')}" th:errors="*{emailContato}"></p>
+        </div>
+        <div>
+          <label for="telefone" class="field-label">Telefone</label>
+          <input id="telefone" type="tel" th:field="*{telefone}" class="field">
+          <p class="field-error" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <a th:href="@{/clientes}" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary">Salvar</button>
+      </div>
+    </form>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

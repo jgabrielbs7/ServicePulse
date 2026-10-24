@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Usuário')}"></head>
+<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+  <header th:replace="~{fragments/layout :: topbar('usuarios')}"></header>
+
+  <div th:replace="~{fragments/layout :: mobileMenu}"></div>
+  <div id="sidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
+  <main class="lg:ml-64 pt-14 lg:pt-0 mx-auto max-w-2xl px-4 py-8 sm:px-6">
+    <h1 class="text-xl font-semibold" th:text="${form.id == null} ? 'Novo usuário' : 'Editar usuário'">Usuário</h1>
+
+    <form th:action="${form.id == null} ? @{/admin/usuarios} : @{/admin/usuarios/{id}(id=${form.id})}"
+          th:object="${form}" method="post" class="card mt-6 space-y-5 p-6">
+
+      <div th:if="${#fields.hasGlobalErrors()}" role="alert"
+           class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">
+        <p th:each="e : ${#fields.globalErrors()}" th:text="${e}"></p>
+      </div>
+
+      <div>
+        <label for="nome" class="field-label">Nome</label>
+        <input id="nome" type="text" th:field="*{nome}" class="field" autofocus>
+        <p class="field-error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+      </div>
+
+      <div>
+        <label for="email" class="field-label">E-mail (usado no login)</label>
+        <input id="email" type="email" th:field="*{email}" class="field">
+        <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+      </div>
+
+      <div>
+        <label for="perfil" class="field-label">Perfil de acesso</label>
+        <select id="perfil" th:field="*{perfil}" class="field">
+          <option th:each="p : ${perfis}" th:value="${p}" th:text="${p.label}"></option>
+        </select>
+        <ul class="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
+          <li><span class="font-medium text-gray-700 dark:text-gray-200">Técnico:</span> abre e atualiza chamados e cadastra clientes.</li>
+          <li><span class="font-medium text-gray-700 dark:text-gray-200">Administrador:</span> tudo do técnico, mais Analytics e gestão de usuários.</li>
+        </ul>
+        <p class="field-error" th:if="${#fields.hasErrors('perfil')}" th:errors="*{perfil}"></p>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="senha" class="field-label" th:text="${form.id == null} ? 'Senha' : 'Nova senha'">Senha</label>
+          <input id="senha" type="password" th:field="*{senha}" autocomplete="new-password" class="field">
+          <p th:if="${form.id != null}" class="mt-1 text-sm text-gray-500 dark:text-gray-400">Deixe em branco para manter a atual.</p>
+          <p class="field-error" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></p>
+        </div>
+        <div>
+          <label for="confirmarSenha" class="field-label">Confirmar senha</label>
+          <input id="confirmarSenha" type="password" th:field="*{confirmarSenha}" autocomplete="new-password" class="field">
+          <p class="field-error" th:if="${#fields.hasErrors('confirmarSenha')}" th:errors="*{confirmarSenha}"></p>
+        </div>
+      </div>
+
+      <label class="flex items-start gap-3 text-sm">
+        <input type="checkbox" th:field="*{ativo}" class="mt-0.5 h-4 w-4 rounded border-gray-300 text-gray-600 focus:ring-gray-600 dark:border-gray-600 dark:bg-gray-900">
+        <span>
+          <span class="font-medium">Usuário ativo</span>
+          <span class="block text-gray-500 dark:text-gray-400">Usuários inativos não conseguem entrar e não aparecem na lista de técnicos.</span>
+        </span>
+      </label>
+
+      <div class="flex justify-end gap-3">
+        <a th:href="@{/admin/usuarios}" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary">Salvar</button>
+      </div>
+    </form>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

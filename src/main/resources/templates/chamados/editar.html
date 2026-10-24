@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Editar chamado')}"></head>
+<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+  <header th:replace="~{fragments/layout :: topbar('dashboard')}"></header>
+
+  <div th:replace="~{fragments/layout :: mobileMenu}"></div>
+  <div id="sidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
+  <main class="lg:ml-64 pt-14 lg:pt-0 mx-auto max-w-2xl px-4 py-8 sm:px-6">
+    <h1 class="text-xl font-semibold" th:text="'Chamado ' + ${chamado.codigo}">Chamado</h1>
+
+    <section class="card mt-6 p-6">
+      <dl class="grid gap-4 text-sm sm:grid-cols-2">
+        <div><dt class="text-gray-500 dark:text-gray-400">Cliente</dt><dd class="mt-0.5 font-medium" th:text="${chamado.cliente.razaoSocial}">Cliente</dd></div>
+        <div><dt class="text-gray-500 dark:text-gray-400">Motivo</dt><dd class="mt-0.5 font-medium" th:text="${chamado.motivoAbertura}">Motivo</dd></div>
+        <div><dt class="text-gray-500 dark:text-gray-400">Aberto em</dt><dd class="mt-0.5 font-medium" th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}">Data</dd></div>
+        <div th:if="${chamado.dataFechamento != null}"><dt class="text-gray-500 dark:text-gray-400">Fechado em</dt><dd class="mt-0.5 font-medium" th:text="${#temporals.format(chamado.dataFechamento, 'dd/MM/yyyy HH:mm')}">Data</dd></div>
+        <div class="sm:col-span-2"><dt class="text-gray-500 dark:text-gray-400">Descrição</dt><dd class="mt-0.5 whitespace-pre-line" th:text="${chamado.descricao}">Descrição</dd></div>
+      </dl>
+    </section>
+
+    <form th:action="@{/admin/chamados/{id}(id=${chamado.id})}" th:object="${form}" method="post" class="card mt-6 space-y-5 p-6">
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="status" class="field-label">Status</label>
+          <select id="status" th:field="*{status}" class="field">
+            <option th:each="s : ${statusList}" th:value="${s}" th:text="${s.label}"></option>
+          </select>
+          <p class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></p>
+        </div>
+        <div>
+          <label for="prioridade" class="field-label">Prioridade</label>
+          <select id="prioridade" th:field="*{prioridade}" class="field">
+            <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p.label}"></option>
+          </select>
+          <p class="field-error" th:if="${#fields.hasErrors('prioridade')}" th:errors="*{prioridade}"></p>
+        </div>
+      </div>
+
+      <div>
+        <label for="tecnicoId" class="field-label">Técnico responsável</label>
+        <select id="tecnicoId" th:field="*{tecnicoId}" class="field">
+          <option value="">Sem técnico</option>
+          <option th:each="t : ${tecnicos}" th:value="${t.id}" th:text="${t.nome}"></option>
+        </select>
+      </div>
+
+      <div>
+        <label for="tempoAtendimentoMinutos" class="field-label">Tempo de atendimento (minutos)</label>
+        <input id="tempoAtendimentoMinutos" type="number" min="0" th:field="*{tempoAtendimentoMinutos}" class="field">
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Ao fechar sem informar, o sistema calcula do momento da abertura até agora.</p>
+        <p class="field-error" th:if="${#fields.hasErrors('tempoAtendimentoMinutos')}" th:errors="*{tempoAtendimentoMinutos}"></p>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <a th:href="@{/admin/dashboard}" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary">Salvar alterações</button>
+      </div>
+    </form>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

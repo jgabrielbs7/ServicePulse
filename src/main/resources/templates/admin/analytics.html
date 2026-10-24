@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Analytics')}"></head>
+<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+  <header th:replace="~{fragments/layout :: topbar('analytics')}"></header>
+
+  <div th:replace="~{fragments/layout :: mobileMenu}"></div>
+  <div id="sidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
+  <main class="lg:ml-64 pt-14 lg:pt-0 mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <h1 class="text-xl font-semibold">Analytics</h1>
+
+    <section class="mt-6 rounded-xl border border-gray-300 bg-gray-200 p-6 dark:border-gray-700 dark:bg-gray-800 sm:p-8">
+      <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Bem-vindo ao ServicePulse</p>
+      <h2 class="mt-2 text-2xl font-semibold tracking-tight text-gray-800 dark:text-white">Olá! Que bom ter você por aqui.</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-300">Este é o painel de analytics do sistema. Acompanhe os chamados, identifique os motivos mais frequentes e visualize os clientes com maior volume de solicitações.</p>
+    </section>
+
+    <section class="card mt-6 p-5">
+      <h2 class="text-base font-medium">Chamados abertos por dia</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Últimos 30 dias</p>
+      <div class="relative mt-4 h-72"><canvas id="chartDias" aria-label="Volume de chamados por dia" role="img"></canvas></div>
+    </section>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <section class="card p-5">
+        <h2 class="text-base font-medium">Motivos de abertura mais frequentes</h2>
+        <div class="relative mt-4 h-72"><canvas id="chartMotivos" aria-label="Distribuição dos motivos de abertura" role="img"></canvas></div>
+      </section>
+      <section class="card p-5">
+        <h2 class="text-base font-medium">Top 5 clientes por chamados</h2>
+        <div class="relative mt-4 h-72"><canvas id="chartClientes" aria-label="Clientes com mais chamados" role="img"></canvas></div>
+      </section>
+    </div>
+  </main>
+
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script th:inline="javascript">
+    const dias     = { labels: /*[[${diasLabels}]]*/ [],     valores: /*[[${diasValores}]]*/ [] };
+    const motivos  = { labels: /*[[${motivosLabels}]]*/ [],  valores: /*[[${motivosValores}]]*/ [] };
+    const clientes = { labels: /*[[${clientesLabels}]]*/ [], valores: /*[[${clientesValores}]]*/ [] };
+
+    (function () {
+      const isDark = () => document.documentElement.classList.contains('dark');
+      const cores = () => isDark()
+        ? { texto: '#cbd5e1', grade: '#334155', superficie: '#1e293b', linha: '#94a3b8', area: 'rgba(148,163,184,0.16)', barra: '#94a3b8' }
+        : { texto: '#475569', grade: '#e2e8f0', superficie: '#ffffff', linha: '#64748b', area: 'rgba(100,116,139,0.10)', barra: '#64748b' };
+      const serie = ['#525252', '#737373', '#a3a3a3', '#404040', '#d4d4d4', '#858585'];
+
+      Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+      const c0 = cores();
+
+      const linha = new Chart(document.getElementById('chartDias'), {
+        type: 'line',
+        data: { labels: dias.labels, datasets: [{ label: 'Chamados', data: dias.valores, borderColor: c0.linha,
+                backgroundColor: c0.area, fill: true, tension: 0.25, pointRadius: 2, borderWidth: 2 }] },
+        options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+          scales: { x: { ticks: { color: c0.texto, maxTicksLimit: 10 }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { color: c0.texto, precision: 0 }, grid: { color: c0.grade } } } }
+      });
+
+      const rosca = new Chart(document.getElementById('chartMotivos'), {
+        type: 'doughnut',
+        data: { labels: motivos.labels, datasets: [{ data: motivos.valores, backgroundColor: serie, borderColor: c0.superficie, borderWidth: 2 }] },
+        options: { maintainAspectRatio: false, cutout: '62%',
+          plugins: { legend: { position: 'bottom', labels: { color: c0.texto, boxWidth: 12 } } } }
+      });
+
+      const barras = new Chart(document.getElementById('chartClientes'), {
+        type: 'bar',
+        data: { labels: clientes.labels, datasets: [{ label: 'Chamados', data: clientes.valores, backgroundColor: c0.barra, borderRadius: 3 }] },
+        options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { color: c0.texto, precision: 0 }, grid: { color: c0.grade } },
+                    y: { ticks: { color: c0.texto }, grid: { display: false } } } }
+      });
+
+      function aplicarTema() {
+        const c = cores();
+        linha.data.datasets[0].borderColor = c.linha;
+        linha.data.datasets[0].backgroundColor = c.area;
+        rosca.data.datasets[0].borderColor = c.superficie;
+        barras.data.datasets[0].backgroundColor = c.barra;
+        rosca.options.plugins.legend.labels.color = c.texto;
+        [linha, barras].forEach(function (ch) {
+          Object.values(ch.options.scales).forEach(function (s) {
+            s.ticks.color = c.texto;
+            if (s.grid.display !== false) s.grid.color = c.grade;
+          });
+        });
+        [linha, rosca, barras].forEach(function (ch) { ch.update(); });
+      }
+      window.addEventListener('themechange', aplicarTema);
+    })();
+  </script>
+</body>
+</html>
