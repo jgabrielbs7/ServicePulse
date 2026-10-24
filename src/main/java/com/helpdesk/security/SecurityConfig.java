@@ -21,7 +21,7 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/error", "/error/**", "/favicon.ico", "/images/**", "/css/**", "/js/**", "/static/**").permitAll()
+                .requestMatchers("/login", "/error", "/error/**", "/favicon.ico", "/favicon.svg", "/images/**", "/css/**", "/js/**", "/static/**").permitAll()
                 // Somente administradores
                 .requestMatchers("/admin/usuarios/**", "/admin/motivos/**").hasRole("ADMIN")
                 .requestMatchers("/admin/analytics/**").hasAnyRole("ADMIN", "TECNICO")

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Analytics')}"></head>
-<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+<body class="min-h-screen bg-gray-100 font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
   <header th:replace="~{fragments/layout :: topbar('analytics')}"></header>
 
   <div th:replace="~{fragments/layout :: mobileMenu}"></div>
@@ -9,7 +9,7 @@
   <main class="lg:ml-64 pt-14 lg:pt-0 mx-auto max-w-7xl px-4 py-8 sm:px-6">
     <h1 class="text-xl font-semibold">Analytics</h1>
 
-    <section class="mt-6 rounded-xl border border-gray-300 bg-gray-200 p-6 dark:border-gray-700 dark:bg-gray-800 sm:p-8">
+    <section class="mt-6 rounded-xl border border-gray-200 bg-brand-50 p-6 dark:border-gray-700 dark:bg-gray-800 sm:p-8">
       <p class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Bem-vindo ao ServicePulse</p>
       <h2 class="mt-2 text-2xl font-semibold tracking-tight text-gray-800 dark:text-white">Olá! Que bom ter você por aqui.</h2>
       <p class="mt-2 max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-300">Este é o painel de analytics do sistema. Acompanhe os chamados, identifique os motivos mais frequentes e visualize os clientes com maior volume de solicitações.</p>
@@ -43,11 +43,11 @@
     (function () {
       const isDark = () => document.documentElement.classList.contains('dark');
       const cores = () => isDark()
-        ? { texto: '#cbd5e1', grade: '#334155', superficie: '#1e293b', linha: '#94a3b8', area: 'rgba(148,163,184,0.16)', barra: '#94a3b8' }
-        : { texto: '#475569', grade: '#e2e8f0', superficie: '#ffffff', linha: '#64748b', area: 'rgba(100,116,139,0.10)', barra: '#64748b' };
-      const serie = ['#525252', '#737373', '#a3a3a3', '#404040', '#d4d4d4', '#858585'];
+        ? { texto: '#d4d4d4', grade: '#404040', superficie: '#262626', linha: '#60a5fa', area: 'rgba(96,165,250,0.18)', barra: '#34d399' }
+        : { texto: '#475569', grade: '#e2e8f0', superficie: '#ffffff', linha: '#2563eb', area: 'rgba(37,99,235,0.12)', barra: '#10b981' };
+      const serie = ['#2563eb', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16'];
 
-      Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+      Chart.defaults.font.family = "'Manrope', system-ui, sans-serif";
       const c0 = cores();
 
       const linha = new Chart(document.getElementById('chartDias'), {
