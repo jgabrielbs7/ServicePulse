@@ -8,7 +8,8 @@ RUN mvn -B -DskipTests package
 # Runtime stage
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+UseSerialGC"
+ENV TZ=America/Sao_Paulo
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+UseSerialGC -Duser.timezone=America/Sao_Paulo"
 COPY --from=build /app/target/helpdesk-1.0.0.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
